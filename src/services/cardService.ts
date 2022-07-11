@@ -1,25 +1,34 @@
 import {faker} from "@faker-js/faker"
-import { CardInsertData } from "../repositories/cardRepository.js"
+import Cryptr from "cryptr"
+import dotenv from "dotenv";
+dotenv.config();
+
+import { CardInsertData, TransactionTypes } from "../repositories/cardRepository.js"
+import * as cardRepository from "../repositories/cardRepository.js"
 import * as employeeRepository from "../repositories/employeeRepository.js"
 
-export async function newCard(employee: any){
+const cryptrSecret = process.env.CRYPTR_SECRET
+const CRYPTR = new Cryptr(cryptrSecret)
+
+export async function newCard(employee: employeeRepository.Employee, type: TransactionTypes){
     const number = faker.finance.creditCardNumber()
     const cardholderName = formatName(employee.fullName)
     const expirationDate = formatExpirationDate()
+    const cvv = CRYPTR.encrypt(faker.finance.creditCardCVV())
     
-    const card:any = {
+    const card:CardInsertData = {
         employeeId: employee.id,
         number: number,
         cardholderName: cardholderName,
-        //securityCode,
+        securityCode: cvv,
         expirationDate,
-        //password,
-        //isVirtual,
-        //originalCardId,
-        //isBlocked,
-        //type
+        password: undefined,
+        isVirtual: true,
+        originalCardId: undefined,
+        isBlocked: false,
+        type: type
     }
-    return card
+    return await cardRepository.insert(card)
 }
 
 function formatName(name: string): string{
