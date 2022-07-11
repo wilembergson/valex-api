@@ -1,5 +1,6 @@
 import {faker} from "@faker-js/faker"
 import Cryptr from "cryptr"
+import bcrypt from 'bcrypt';
 import dotenv from "dotenv";
 dotenv.config();
 
@@ -60,9 +61,51 @@ function formatExpirationDate():string{
     const yyyy = yearData.toString()
     const year = `${yyyy[2]}${yyyy[3]}`
     return `${month}/${year}`;
-  }
+}
 
-  async function checkCardWithSameType(type: TransactionTypes, employeeId: number) {
-    const result = await cardRepository.findByTypeAndEmployeeId(type, employeeId)
-    if(result) Error(`Este funcionário já tem um cartão do tipo ${type}.`, 422)
-  }
+async function checkCardWithSameType(type: TransactionTypes, employeeId: number) {
+  const result = await cardRepository.findByTypeAndEmployeeId(type, employeeId)
+  if(result) Error(`Este funcionário já tem um cartão do tipo ${type}.`, 422)
+}
+
+export async function activateCard(cardId:number,securityCode:number, password: number){
+    const card = await getCard(cardId)
+    await checkPasswordLength(password)
+    await checkActive(card.password)
+    await checkCVV(card.securityCode, securityCode.toString())
+    await checkExpirationDate(card.expirationDate)
+    const cryptPassword = bcrypt.hashSync(password.toString(), 10)
+    card.password = cryptPassword
+    const cardUpdated: cardRepository.CardUpdateData = card
+    return await cardRepository.update(card.id, cardUpdated)
+}
+
+async function getCard(id:number) {
+    const card = await cardRepository.findById(id)
+    if(!card) throw Error("ID do cartão informado inexistente.", 404)
+    return card
+}
+
+async function checkCVV(encrySecurityCode:string, securityCode:string){
+    console.log(CRYPTR.decrypt(encrySecurityCode))
+    if(CRYPTR.decrypt(encrySecurityCode) !== securityCode) throw Error("Codígo de segurança não confere com o cartão.", 401)
+}
+
+async function checkActive(password:string) {
+    if(password) throw Error("Este cartão já está ativado.", 401)    
+}
+
+async function checkExpirationDate(date:string){
+    const dateArray = date.split("/")
+    const expirationMonth = parseInt(dateArray[0])
+    const expirationYear = parseInt(dateArray[1])
+    const currentYear = new Date().getUTCFullYear() - 2000;
+    const currentMonth = new Date().getUTCMonth() + 1;
+    if(currentMonth > expirationMonth && currentYear >= expirationYear){
+        throw Error("Este cartão expirou.",401)
+    }
+}
+
+async function checkPasswordLength(password: number){ 
+    if(password.toString().length !== 4) throw Error("A senha deve ter 4 digitos.", 422)
+}
