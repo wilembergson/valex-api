@@ -4,6 +4,6 @@ import { employeeValidateMiddleware } from "../middlewares/employeeMiddleware.js
 
 const cardRouter = Router()
 
-cardRouter.get('/newcard', employeeValidateMiddleware, newCard)
+cardRouter.post('/newcard', employeeValidateMiddleware, newCard)
 
 export default cardRouter

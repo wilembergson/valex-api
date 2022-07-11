@@ -6,11 +6,14 @@ dotenv.config();
 import { CardInsertData, TransactionTypes } from "../repositories/cardRepository.js"
 import * as cardRepository from "../repositories/cardRepository.js"
 import * as employeeRepository from "../repositories/employeeRepository.js"
+import Error from "../utils/error.js";
 
 const cryptrSecret = process.env.CRYPTR_SECRET
 const CRYPTR = new Cryptr(cryptrSecret)
 
 export async function newCard(employee: employeeRepository.Employee, type: TransactionTypes){
+    await checkCardWithSameType(type, employee.id)
+
     const number = faker.finance.creditCardNumber()
     const cardholderName = formatName(employee.fullName)
     const expirationDate = formatExpirationDate()
@@ -57,4 +60,9 @@ function formatExpirationDate():string{
     const yyyy = yearData.toString()
     const year = `${yyyy[2]}${yyyy[3]}`
     return `${month}/${year}`;
+  }
+
+  async function checkCardWithSameType(type: TransactionTypes, employeeId: number) {
+    const result = await cardRepository.findByTypeAndEmployeeId(type, employeeId)
+    if(result) Error(`Este funcionário já tem um cartão do tipo ${type}.`, 422)
   }
