@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { activateCard, getBalanceAndTansactions, newCard, unlockCard } from "../controllers/cardController.js";
-import { checkCard, employeeValidateMiddleware, passwordValidateMiddleware } from "../middlewares/employeeMiddleware.js";
+import { checkCard, employeeValidateMiddleware, passwordValidateMiddleware } from "../middlewares/cardMiddleware.js";
 import { blockCard } from "../controllers/cardController.js";
 
 const cardRouter = Router()
