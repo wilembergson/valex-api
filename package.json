@@ -5,7 +5,8 @@
   "type": "module",
   "main": "src/app.ts",
   "scripts": {
-    "start": "src/app.ts",
+    "build": "tsc",
+	  "start": "node dist/app.js",
     "dev": "nodemon src/app.ts"
   },
   "keywords": [],

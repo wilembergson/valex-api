@@ -13,23 +13,15 @@ import Error from "../utils/error.js";
 
 const cryptrSecret = process.env.CRYPTR_SECRET
 const CRYPTR = new Cryptr(cryptrSecret)
-//FALTA CONCLUIR//////////////////////////////////////
-export async function getTransactions(cardId: number){
-    const transactions = await paymentRepository.findByCardId(cardId)
-    const recharges = await rechargeRepository.findByCardId(cardId)
-    return {
-       balance: "xxx",
-       transactions,
-       recharges
-    }
-   }
+
 export async function newCard(employee: employeeRepository.Employee, type: TransactionTypes){
     await checkCardWithSameType(type, employee.id)
 
     const number = faker.finance.creditCardNumber()
     const cardholderName = formatName(employee.fullName)
     const expirationDate = formatExpirationDate()
-    const cvv = CRYPTR.encrypt(faker.finance.creditCardCVV())
+    const cvvGenerate = faker.finance.creditCardCVV()
+    const cvv = CRYPTR.encrypt(cvvGenerate)
     
     const card:CardInsertData = {
         employeeId: employee.id,
@@ -43,7 +35,9 @@ export async function newCard(employee: employeeRepository.Employee, type: Trans
         isBlocked: false,
         type: type
     }
-    return await cardRepository.insert(card)
+    await cardRepository.insert(card)
+    card.securityCode = cvvGenerate
+    return card
 }
 
 function formatName(name: string): string{

@@ -6,7 +6,7 @@ export async function newCard(req:Request, res: Response) {
     const employee = await cardData.employee
     const cardType = await cardData.cardType
     const newCard = await cardService.newCard(employee, cardType)
-    return res.status(201).json({newCard})
+    return res.status(201).json(newCard)
 }
 
 export async function activateCard(req:Request, res: Response){
@@ -16,12 +16,6 @@ export async function activateCard(req:Request, res: Response){
     const password = await activateCardData.password
     const card = await cardService.activateCard(cardId,securityCode, password)
     return res.status(200).send(card)
-}
-
-export async function getBalanceAndTansactions(req:Request, res: Response){
-    const {cardId} = req.body
-    const transactions = await cardService.getTransactions(cardId)
-    return res.status(200).send(transactions)
 }
 
 export async function blockCard(req:Request, res: Response){
