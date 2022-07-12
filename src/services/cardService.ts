@@ -13,7 +13,16 @@ import Error from "../utils/error.js";
 
 const cryptrSecret = process.env.CRYPTR_SECRET
 const CRYPTR = new Cryptr(cryptrSecret)
-
+//FALTA CONCLUIR//////////////////////////////////////
+export async function getTransactions(cardId: number){
+    const transactions = await paymentRepository.findByCardId(cardId)
+    const recharges = await rechargeRepository.findByCardId(cardId)
+    return {
+       balance: "xxx",
+       transactions,
+       recharges
+    }
+   }
 export async function newCard(employee: employeeRepository.Employee, type: TransactionTypes){
     await checkCardWithSameType(type, employee.id)
 
@@ -82,7 +91,7 @@ export async function activateCard(cardId:number,securityCode:number, password: 
     return await cardRepository.update(card.id, cardUpdated)
 }
 
-async function getCard(id:number) {
+export async function getCard(id:number) {
     const card = await cardRepository.findById(id)
     if(!card) throw Error("ID do cartão informado inexistente.", 404)
     return card
@@ -111,16 +120,6 @@ async function checkExpirationDate(date:string){
 async function checkPasswordLength(password: number){ 
     if(password.toString().length !== 4) throw Error("A senha deve ter 4 digitos.", 422)
 }
-//FALTA CONCLUIR
-export async function getTransactions(cardId: number){
- const transactions = await paymentRepository.findByCardId(cardId)
- const recharges = await rechargeRepository.findByCardId(cardId)
- return {
-    balance: "xxx",
-    transactions,
-    recharges
- }
-}
 
 export async function blockCard(cardId: number, password: number){
     const card = await getCard(cardId)
@@ -143,6 +142,7 @@ export async function unlockCard(cardId: number, password: number){
 }
 
 async function checkPassWord(hashPassword: string, password: string){
+    if(!hashPassword) Error('Este cartão ainda não foi ativado.', 401)
     const compare =  bcrypt.compareSync(password, hashPassword)
     if(!compare) Error('Senha incompatível com o cartão.', 401)
 }
