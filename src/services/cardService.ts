@@ -111,7 +111,7 @@ async function checkExpirationDate(date:string){
 async function checkPasswordLength(password: number){ 
     if(password.toString().length !== 4) throw Error("A senha deve ter 4 digitos.", 422)
 }
-
+//FALTA CONCLUIR
 export async function getTransactions(cardId: number){
  const transactions = await paymentRepository.findByCardId(cardId)
  const recharges = await rechargeRepository.findByCardId(cardId)
@@ -120,4 +120,36 @@ export async function getTransactions(cardId: number){
     transactions,
     recharges
  }
+}
+
+export async function blockCard(cardId: number, password: number){
+    const card = await getCard(cardId)
+    await checkPassWord(card.password, password.toString())
+    await checkBlocked(card.isBlocked)
+    await checkExpirationDate(card.expirationDate)
+    card.isBlocked = true
+    await cardRepository.update(card.id, card)
+    return {message:'Cartão bloqueado com sucesso.'}
+}
+
+export async function unlockCard(cardId: number, password: number){
+    const card = await getCard(cardId)
+    await checkPassWord(card.password, password.toString())
+    await checkUnlocked(card.isBlocked)
+    await checkExpirationDate(card.expirationDate)
+    card.isBlocked = false
+    await cardRepository.update(card.id, card)
+    return {message:'Cartão desbloqueado com sucesso.'}
+}
+
+async function checkPassWord(hashPassword: string, password: string){
+    const compare =  bcrypt.compareSync(password, hashPassword)
+    if(!compare) Error('Senha incompatível com o cartão.', 401)
+}
+
+async function checkBlocked(isBlocked: boolean){
+    if(isBlocked) Error("Este cartão já está bloqueado.", 401)
+}
+async function checkUnlocked(isBlocked: boolean){
+    if(!isBlocked) Error("Este cartão já está desbloqueado.", 401)
 }

@@ -23,3 +23,14 @@ export async function getBalanceAndTansactions(req:Request, res: Response){
     const transactions = await cardService.getTransactions(cardId)
     return res.status(200).send(transactions)
 }
+
+export async function blockCard(req:Request, res: Response){
+    const {cardId, password} = req.body
+    const compare = await cardService.blockCard(cardId, password)
+    return res.status(200).json(compare)
+}
+export async function unlockCard(req:Request, res: Response){
+    const {cardId, password} = req.body
+    const compare = await cardService.unlockCard(cardId, password)
+    return res.status(200).json(compare)
+}
