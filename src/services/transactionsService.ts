@@ -48,3 +48,15 @@ async function getAmount(list:any[]) {
     list.forEach(element => sum += element.amount)
     return sum
 }
+
+export async function listTransactions(cardId: number){
+    const balance = await getBalance(cardId)
+    const transactions = await paymentRepository.findByCardId(cardId)
+    const recharges = await rechargesRepository.findByCardId(cardId)
+    const result = {
+        balance,
+        transactions,
+        recharges
+    }
+    return result
+}

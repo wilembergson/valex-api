@@ -13,3 +13,9 @@ export async function newBuy(req: Request, res: Response){
     const result = await transationsService.newBuy(buyData.cardId, buyData.password, buyData.businessId, buyData.amount)
     return res.status(201).json(result)
 }
+
+export async function listTransactions(req: Request, res: Response){
+    const {cardId} = req.body
+    const transactionsData = await transationsService.listTransactions(cardId)
+    return res.status(200).json(transactionsData)
+}
