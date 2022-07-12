@@ -102,11 +102,11 @@ async function checkCVV(encrySecurityCode:string, securityCode:string){
     if(CRYPTR.decrypt(encrySecurityCode) !== securityCode) throw Error("Codígo de segurança não confere com o cartão.", 401)
 }
 
-async function checkActive(password:string) {
+export async function checkActive(password:string) {
     if(password) throw Error("Este cartão já está ativado.", 401)    
 }
 
-async function checkExpirationDate(date:string){
+export async function checkExpirationDate(date:string){
     const dateArray = date.split("/")
     const expirationMonth = parseInt(dateArray[0])
     const expirationYear = parseInt(dateArray[1])
@@ -141,14 +141,14 @@ export async function unlockCard(cardId: number, password: number){
     return {message:'Cartão desbloqueado com sucesso.'}
 }
 
-async function checkPassWord(hashPassword: string, password: string){
+export async function checkPassWord(hashPassword: string, password: string){
     if(!hashPassword) Error('Este cartão ainda não foi ativado.', 401)
     const compare =  bcrypt.compareSync(password, hashPassword)
     if(!compare) Error('Senha incompatível com o cartão.', 401)
 }
 
-async function checkBlocked(isBlocked: boolean){
-    if(isBlocked) Error("Este cartão já está bloqueado.", 401)
+export async function checkBlocked(isBlocked: boolean){
+    if(isBlocked) Error("Este cartão está bloqueado.", 401)
 }
 async function checkUnlocked(isBlocked: boolean){
     if(!isBlocked) Error("Este cartão já está desbloqueado.", 401)
