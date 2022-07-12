@@ -1,9 +1,10 @@
 import { NextFunction, Request, Response } from "express"
-import Joi from "joi"
 
 import { TransactionTypes } from "../repositories/cardRepository.js"
 import * as employeeRepository from "../repositories/employeeRepository.js"
 import * as companyRepository from "../repositories/companyRepository.js"
+import * as cardRepository from "../repositories/cardRepository.js"
+
 import Error from "../utils/error.js"
 import { activateCardSchema } from "../utils/schemas.js"
 
@@ -34,5 +35,12 @@ export async function passwordValidateMiddleware(req:Request, res: Response, nex
         securityCode,
         password
     }
+    next()
+}
+
+export async function checkCard(req:Request, res: Response, next: NextFunction){
+    const {cardId} = req.body
+    const card = await cardRepository.findById(cardId)
+    if(!card) Error(`Cartão com ID ${cardId} inexistente.`, 404)
     next()
 }

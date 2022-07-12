@@ -17,3 +17,9 @@ export async function activateCard(req:Request, res: Response){
     const card = await cardService.activateCard(cardId,securityCode, password)
     return res.status(200).send(card)
 }
+
+export async function getBalanceAndTansactions(req:Request, res: Response){
+    const {cardId} = req.body
+    const transactions = await cardService.getTransactions(cardId)
+    return res.status(200).send(transactions)
+}

@@ -7,6 +7,8 @@ dotenv.config();
 import { CardInsertData, TransactionTypes } from "../repositories/cardRepository.js"
 import * as cardRepository from "../repositories/cardRepository.js"
 import * as employeeRepository from "../repositories/employeeRepository.js"
+import * as paymentRepository from "../repositories/paymentRepository.js"
+import * as rechargeRepository from "../repositories/rechargeRepository.js"
 import Error from "../utils/error.js";
 
 const cryptrSecret = process.env.CRYPTR_SECRET
@@ -108,4 +110,14 @@ async function checkExpirationDate(date:string){
 
 async function checkPasswordLength(password: number){ 
     if(password.toString().length !== 4) throw Error("A senha deve ter 4 digitos.", 422)
+}
+
+export async function getTransactions(cardId: number){
+ const transactions = await paymentRepository.findByCardId(cardId)
+ const recharges = await rechargeRepository.findByCardId(cardId)
+ return {
+    balance: "xxx",
+    transactions,
+    recharges
+ }
 }
