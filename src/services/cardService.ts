@@ -1,4 +1,4 @@
-import {faker} from "@faker-js/faker"
+import { faker } from "@faker-js/faker";
 import Cryptr from "cryptr"
 import bcrypt from 'bcrypt';
 import dotenv from "dotenv";
@@ -7,8 +7,6 @@ dotenv.config();
 import { CardInsertData, TransactionTypes } from "../repositories/cardRepository.js"
 import * as cardRepository from "../repositories/cardRepository.js"
 import * as employeeRepository from "../repositories/employeeRepository.js"
-import * as paymentRepository from "../repositories/paymentRepository.js"
-import * as rechargeRepository from "../repositories/rechargeRepository.js"
 import Error from "../utils/error.js";
 
 const cryptrSecret = process.env.CRYPTR_SECRET
